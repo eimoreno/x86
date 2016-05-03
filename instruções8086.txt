@@ -1,0 +1,104 @@
+mips:
+            ( NOP,ADDU, SUBU, AAND, OOR, XXOR, NNOR, SSLL, SLLV, SSRA, SRAV, SSRL, SRLV,
+            ADDIU, ANDI, ORI, XORI, LUI, LBU, LW, SB, SW, SLT, SLTU, SLTI,
+            SLTIU, BEQ, BGEZ, BLEZ, BNE, J, JAL, JALR, JR, invalid_instruction);
+
+
+
+https://en.wikipedia.org/wiki/Intel_8086
+http://www.gabrielececchetti.it/Teaching/CalcolatoriElettronici/Docs/i8086_instruction_set.pdf
+http://courses.ee.sun.ac.za/OLD/2003/Rekenaarstelsels245/8086_Instruksies/asm_tutorial_01.html
+
+
+
+
+colocar:
+AAM 
+AAD
+AAS
+ADC - add with carry -> reg,m; m,reg; reg,reg;mem, im;im,mem;
+Add - simple add- > reg,m; m,reg; reg,reg;mem, im;im,mem;
+AND- simple and -> " "
+CALL -> volta para o procedimento -> bom para funções! :) 
+CMP -> compare -> reg,m; m,reg; reg,reg;mem, im;im,mem;
+DAA -decimal adjust after addition
+DAS - ""   "" "" substraction
+DEC
+DIV- unsigned div
+IDIV - signied div
+IMUL - signed mul
+INC
+LEA - load effective to address
+MOV
+MUL - unsigned mult
+neg
+nop
+NOT
+OR
+OUT - output from al or ax to port
+ROL -rotate op1 left
+ROR	
+SAL -arithmetic shift
+SAR	
+SHL -shift op left Shift operand1 Left. The number of shifts is setby operand2. ;;; - memory, immediate REG, immediate,memory, CL REG, CL 
+SHR
+XOR
+CMP: compare -> usado nos jumps!!!!!!!!!!!!
+JMP
+JE: jump if equal
+JBE : bellow or equal
+JG : greater
+JE: equal
+
+
+Interessantes:
+HLT -> halt the system 
+CLC -> clear carry flag;
+CLD -> clear direction flag
+CLI -clear interrupg
+IN - input from to AL or AX
+
+
+
+Não colocar:
+CBW -> convert byte to word.
+CMC - complement carry flag;
+CMPSB - compare bytes;
+CMPSW - compare words
+CWD - convert word to double word.
+INT -intenrrupt...
+INTO - interrupt
+IRET -interrupt
+LAHF - Load AH from 8 low bits of Flags register. 
+LDS - Load memory double word into word register and DS.  
+LES - Load memory double word into word register and ES. 
+LODSB - Load byte at DS:[SI] into AL. Update SI
+LODSW - Load word at DS:[SI] into AX. Update SI.
+MOVSB - Copy byte at DS:[SI] to ES:[DI]. Update SI and DI
+MOVSW  - Copy word at DS:[SI] to ES:[DI]. Update SI and DI. 
+POP - Get 16 bit value from the stack. 
+POPA - Pop all general purpose registers DI, SI, BP, SP, BX, DX, CX, AX from the stack. 
+POPF - Get flags register from the stack. 
+PUSH - Store 16 bit value in the stack. 
+PUSHA - Push all general purpose registers AX, CX, DX,BX, SP, BP, SI, DI in the stack.Original value of SP register before PUSHA) is used.
+PUSHF- Store flags register in the stack. 
+RCL - rotate 
+RCR
+REP - Repeat following MOVSB, MOVSW, LODSB, LODSW, STOSB, STOSW instructions CX times. 
+REPE - Repeat following CMPSB, CMPSW, SCASB, SCASW instructions while ZF = 1 (result is Equal),maximum CX times.  
+REPNE - Repeat following CMPSB, CMPSW, SCASB, SCASWinstructions while ZF = 0 (result is Not Equal),maximum CX times. 
+RET- return from near procedure
+RETF -return from far procedure
+SAHF - Store AH register into low 8 bits of Flags register. 
+SBB  - subtractk with borrow
+SCASBCompare bytes: AL from ES:[DI]. 
+SCASW
+STC -set carry
+STD
+STI
+STOSB
+STOSW
+TEST
+XCHG3
+XLATB
+...
