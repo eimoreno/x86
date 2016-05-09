@@ -1,0 +1,4 @@
+
+Teste de arquivo
+no Linux com
+NASM!!

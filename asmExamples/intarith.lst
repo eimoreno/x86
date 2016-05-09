@@ -1,0 +1,152 @@
+     1                                  ; intarith.asm    show some simple C code and corresponding nasm code
+     2                                  ;                 the nasm code is one sample, not unique
+     3                                  ;
+     4                                  ; compile:	nasm -f elf -l intarith.lst  intarith.asm
+     5                                  ; link:		gcc -o intarith  intarith.o
+     6                                  ; run:		intarith
+     7                                  ;
+     8                                  ; the output from running intarith.asm and intarith.c is:	
+     9                                  ; c=5  , a=3, b=4, c=5
+    10                                  ; c=a+b, a=3, b=4, c=7
+    11                                  ; c=a-b, a=3, b=4, c=-1
+    12                                  ; c=a*b, a=3, b=4, c=12
+    13                                  ; c=c/a, a=3, b=4, c=4
+    14                                  ;
+    15                                  ;The file  intarith.c  is:
+    16                                  ;  /* intarith.c */
+    17                                  ;  #include <stdio.h>
+    18                                  ;  int main()
+    19                                  ;  { 
+    20                                  ;    int a=3, b=4, c;
+    21                                  ;
+    22                                  ;    c=5;
+    23                                  ;    printf("%s, a=%d, b=%d, c=%d\n","c=5  ", a, b, c);
+    24                                  ;    c=a+b;
+    25                                  ;    printf("%s, a=%d, b=%d, c=%d\n","c=a+b", a, b, c);
+    26                                  ;    c=a-b;
+    27                                  ;    printf("%s, a=%d, b=%d, c=%d\n","c=a-b", a, b, c);
+    28                                  ;    c=a*b;
+    29                                  ;    printf("%s, a=%d, b=%d, c=%d\n","c=a*b", a, b, c);
+    30                                  ;    c=c/a;
+    31                                  ;    printf("%s, a=%d, b=%d, c=%d\n","c=c/a", a, b, c);
+    32                                  ;    return 0;
+    33                                  ; }
+    34                                  
+    35                                          extern printf		; the C function to be called
+    36                                  
+    37                                  %macro	pabc 1			; a "simple" print macro
+    38                                  	section .data
+    39                                  .str	db	%1,0		; %1 is first actual in macro call
+    40                                  	section .text
+    41                                  				; push onto stack backwards 
+    42                                  	push	dword [c]	; int c
+    43                                  	push	dword [b]	; int b 
+    44                                  	push	dword [a]	; int a
+    45                                  	push	dword .str 	; users string
+    46                                          push    dword fmt       ; address of format string
+    47                                          call    printf          ; Call C function
+    48                                          add     esp,20          ; pop stack 5*4 bytes
+    49                                  %endmacro
+    50                                  	
+    51                                  	section .data  		; preset constants, writeable
+    52 00000000 03000000                a:	dd	3		; 32-bit variable a initialized to 3
+    53 00000004 04000000                b:	dd	4		; 32-bit variable b initializes to 4
+    54 00000008 25732C20613D25642C-     fmt:    db "%s, a=%d, b=%d, c=%d",10,0	; format string for printf
+    55 00000011 20623D25642C20633D-
+    56 0000001A 25640A00           
+    57                                  	
+    58                                  	section .bss 		; unitialized space
+    59 00000000 <res 00000004>          c:	resd	1		; reserve a 32-bit word
+    60                                  
+    61                                  	section .text		; instructions, code segment
+    62                                  	global	 main		; for gcc standard linking
+    63                                  main:				; label
+    64                                  	
+    65                                  lit5:				; c=5;
+    66 00000000 B805000000              	mov	eax,5	 	; 5 is a literal constant
+    67 00000005 A3[00000000]            	mov	[c],eax		; store into c
+    68                                  	pabc	"c=5  "		; invoke the print macro
+    69                              <1>  section .data
+    70 0000001E 633D35202000        <1> .str db %1,0
+    71                              <1>  section .text
+    72                              <1> 
+    73 0000000A FF35[00000000]      <1>  push dword [c]
+    74 00000010 FF35[04000000]      <1>  push dword [b]
+    75 00000016 FF35[00000000]      <1>  push dword [a]
+    76 0000001C 68[1E000000]        <1>  push dword .str
+    77 00000021 68[08000000]        <1>  push dword fmt
+    78 00000026 E8(00000000)        <1>  call printf
+    79 0000002B 81C414000000        <1>  add esp,20
+    80                                  	
+    81                                  addb:				; c=a+b;
+    82 00000031 A1[00000000]            	mov	eax,[a]	 	; load a
+    83 00000036 0305[04000000]          	add	eax,[b]		; add b
+    84 0000003C A3[00000000]            	mov	[c],eax		; store into c
+    85                                  	pabc	"c=a+b"		; invoke the print macro
+    86                              <1>  section .data
+    87 00000024 633D612B6200        <1> .str db %1,0
+    88                              <1>  section .text
+    89                              <1> 
+    90 00000041 FF35[00000000]      <1>  push dword [c]
+    91 00000047 FF35[04000000]      <1>  push dword [b]
+    92 0000004D FF35[00000000]      <1>  push dword [a]
+    93 00000053 68[24000000]        <1>  push dword .str
+    94 00000058 68[08000000]        <1>  push dword fmt
+    95 0000005D E8(00000000)        <1>  call printf
+    96 00000062 81C414000000        <1>  add esp,20
+    97                                  	
+    98                                  subb:				; c=a-b;
+    99 00000068 A1[00000000]            	mov	eax,[a]	 	; load a
+   100 0000006D 2B05[04000000]          	sub	eax,[b]		; subtract b
+   101 00000073 A3[00000000]            	mov	[c],eax		; store into c
+   102                                  	pabc	"c=a-b"		; invoke the print macro
+   103                              <1>  section .data
+   104 0000002A 633D612D6200        <1> .str db %1,0
+   105                              <1>  section .text
+   106                              <1> 
+   107 00000078 FF35[00000000]      <1>  push dword [c]
+   108 0000007E FF35[04000000]      <1>  push dword [b]
+   109 00000084 FF35[00000000]      <1>  push dword [a]
+   110 0000008A 68[2A000000]        <1>  push dword .str
+   111 0000008F 68[08000000]        <1>  push dword fmt
+   112 00000094 E8(00000000)        <1>  call printf
+   113 00000099 81C414000000        <1>  add esp,20
+   114                                  	
+   115                                  mulb:				; c=a*b;
+   116 0000009F A1[00000000]            	mov	eax,[a]	 	; load a (must be eax for multiply)
+   117 000000A4 F72D[04000000]          	imul	dword [b]	; signed integer multiply by b
+   118 000000AA A3[00000000]            	mov	[c],eax		; store bottom half of product into c
+   119                                  	pabc	"c=a*b"		; invoke the print macro
+   120                              <1>  section .data
+   121 00000030 633D612A6200        <1> .str db %1,0
+   122                              <1>  section .text
+   123                              <1> 
+   124 000000AF FF35[00000000]      <1>  push dword [c]
+   125 000000B5 FF35[04000000]      <1>  push dword [b]
+   126 000000BB FF35[00000000]      <1>  push dword [a]
+   127 000000C1 68[30000000]        <1>  push dword .str
+   128 000000C6 68[08000000]        <1>  push dword fmt
+   129 000000CB E8(00000000)        <1>  call printf
+   130 000000D0 81C414000000        <1>  add esp,20
+   131                                  	
+   132                                  diva:				; c=c/a;
+   133 000000D6 A1[00000000]            	mov	eax,[c]	 	; load c
+   134 000000DB BA00000000              	mov	edx,0		; load upper half of dividend with zero
+   135 000000E0 F73D[00000000]          	idiv	dword [a]	; divide double register edx eax by a
+   136 000000E6 A3[00000000]            	mov	[c],eax		; store quotient into c
+   137                                  	pabc	"c=c/a"		; invoke the print macro
+   138                              <1>  section .data
+   139 00000036 633D632F6100        <1> .str db %1,0
+   140                              <1>  section .text
+   141                              <1> 
+   142 000000EB FF35[00000000]      <1>  push dword [c]
+   143 000000F1 FF35[04000000]      <1>  push dword [b]
+   144 000000F7 FF35[00000000]      <1>  push dword [a]
+   145 000000FD 68[36000000]        <1>  push dword .str
+   146 00000102 68[08000000]        <1>  push dword fmt
+   147 00000107 E8(00000000)        <1>  call printf
+   148 0000010C 81C414000000        <1>  add esp,20
+   149                                  
+   150 00000112 B800000000                      mov     eax,0           ; exit code, 0=normal
+   151 00000117 C3                      	ret			; main return to operating system
+   152                                  
