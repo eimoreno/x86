@@ -48,7 +48,7 @@ JMP
 JE: jump if equal
 JBE : bellow or equal
 JG : greater
-JE: equal
+JNE: not equal
 
 
 Interessantes:
